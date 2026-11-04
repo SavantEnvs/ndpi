@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-filecfg-malicious-ja4
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-filecfg-malicious-ja4/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_filecfg_malicious_ja4
+    libfuzzer: true

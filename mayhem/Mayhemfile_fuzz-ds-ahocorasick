@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-ds-ahocorasick
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ds-ahocorasick/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_ahocorasick
+    libfuzzer: true

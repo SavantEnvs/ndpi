@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-alg-hw-rsi-outliers-da
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-alg-hw-rsi-outliers-da/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_hw_rsi_outliers_da
+    libfuzzer: true

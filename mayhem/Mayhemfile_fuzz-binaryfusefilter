@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-binaryfusefilter
+cmds:
+  - cmd: /mayhem/build-out/fuzz_binaryfusefilter
+    libfuzzer: true
