@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-filecfg-protocols
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-filecfg-protocols/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_filecfg_protocols
+    libfuzzer: true

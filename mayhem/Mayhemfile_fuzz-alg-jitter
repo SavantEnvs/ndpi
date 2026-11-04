@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-alg-jitter
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-alg-jitter/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_jitter
+    libfuzzer: true

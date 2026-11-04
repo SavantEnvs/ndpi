@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-alg-ses-des
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-alg-ses-des/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_ses_des
+    libfuzzer: true

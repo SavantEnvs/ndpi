@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-alg-quick-encryption
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_quick_encryption
+    libfuzzer: true

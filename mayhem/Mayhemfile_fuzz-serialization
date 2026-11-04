@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-serialization
+cmds:
+  - cmd: /mayhem/build-out/fuzz_serialization
+    libfuzzer: true

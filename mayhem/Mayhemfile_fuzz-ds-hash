@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-ds-hash
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ds-hash/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_hash
+    libfuzzer: true

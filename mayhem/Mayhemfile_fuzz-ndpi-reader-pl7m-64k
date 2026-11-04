@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-ndpi-reader-pl7m-64k
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ndpi-reader-pl7m-64k/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ndpi_reader_pl7m_64k
+    libfuzzer: true

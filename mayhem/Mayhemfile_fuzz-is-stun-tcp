@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-is-stun-tcp
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-is-stun-tcp/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_is_stun_tcp
+    libfuzzer: true

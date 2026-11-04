@@ -1,0 +1,9 @@
+project: savantenvs/ndpi
+target: fuzz-tls-certificate
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-tls-certificate/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_tls_certificate
+    libfuzzer: true
+    dictionary: /mayhem/mayhem/fuzz-tls-certificate/fuzz-tls-certificate.dict

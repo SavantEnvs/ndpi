@@ -1,0 +1,9 @@
+project: savantenvs/ndpi
+target: fuzz-ndpi-reader-alloc-fail
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ndpi-reader-alloc-fail/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ndpi_reader_alloc_fail
+    libfuzzer: true
+    dictionary: /mayhem/mayhem/fuzz-ndpi-reader-alloc-fail/fuzz-ndpi-reader-alloc-fail.dict

@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ds-domain-classify
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_domain_classify
+    libfuzzer: true

@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-alg-ranking
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_ranking
+    libfuzzer: true

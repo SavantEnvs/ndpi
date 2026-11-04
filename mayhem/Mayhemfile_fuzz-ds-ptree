@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ds-ptree
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_ptree
+    libfuzzer: true

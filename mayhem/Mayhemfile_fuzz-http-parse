@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-http-parse
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-http-parse/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_http_parse
+    libfuzzer: true

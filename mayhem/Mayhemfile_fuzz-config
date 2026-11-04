@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-config
+cmds:
+  - cmd: /mayhem/build-out/fuzz_config
+    libfuzzer: true

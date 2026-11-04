@@ -1,0 +1,175 @@
+# The Mayhem worker: build the commit image from mayhem/Dockerfile, push it to ghcr, then run
+# Mayhem over each Mayhemfile. Runs on manual dispatch and is called by the sync cron
+# (sync.yml) only when upstream actually moved — we fuzz on real upstream movement or an explicit
+# dispatch, NOT on every commit to the mayhem branch.
+# Three duration tiers:
+#   - 300s  (5 min)  manual dispatch / `/check` — a CONFIRMATION run that proves every target gets edges
+#                    in Mayhem (run-health). This is the integrated gate; kept short so /check is fast.
+#   - 1200s (20 min) the weekly sync cron (workflow_call) — regular bug-finding as upstream moves.
+#   - long  (4h+)    a deliberate DEEP-RUN pass: scripts/integration/deep-run.sh, or
+#                    gh workflow run mayhem.yml --ref mayhem -f duration=14400
+# Only the 5-min edges check gates `integrated`; 20m/4h are bug-finding, never required for integrated.
+# Fill in the `mayhemfile` matrix below. Needs the MAYHEM_TOKEN secret.
+name: Mayhem
+
+on:
+  workflow_dispatch:             # manual / `/check` run (gh workflow run mayhem.yml --ref mayhem [-f duration=14400])
+    inputs:
+      duration:
+        description: 'Fuzz seconds per target (default 300 = 5 min confirmation; e.g. 14400 = 4h deep run).'
+        type: string
+        required: false
+        default: '300'
+  workflow_call:                 # sync.yml calls this (only when upstream moved), passing the rebased SHA
+    inputs:
+      ref:
+        description: commit/branch to build (cron passes the freshly-rebased mayhem SHA)
+        type: string
+        required: false
+        default: ''
+      duration:                  # the weekly cron's regular bug-finding run: 20 min (deep-run requests longer)
+        description: fuzz seconds per target
+        type: string
+        required: false
+        default: '1200'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    name: build commit image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write          # push the commit image to ghcr.io/<org>/<repo>
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0          # FULL history — the Dockerfile COPYs .git into /mayhem, so the image
+                                  # must hold a real copy of the `mayhem` branch (upstream history + the
+                                  # additive integration commit). The default depth-1 shallow clone bakes
+                                  # in a single squashed-looking commit and breaks the grader / PATCH tier.
+          ref: ${{ inputs.ref || github.sha }}     # build the cron's rebased SHA when called
+
+      - name: Resolve build SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=raw,value=commit-${{ steps.sha.outputs.sha }}   # tag the exact built commit
+
+      - name: Build and push (mayhem/Dockerfile)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: mayhem/Dockerfile
+          push: true
+          build-args: |
+            COMMIT=${{ steps.sha.outputs.sha }}
+            REPO_URL=${{ github.server_url }}/${{ github.repository }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+      ref: ${{ steps.sha.outputs.sha }}
+
+  mayhem:
+    needs: build
+    name: 'fuzz ${{ matrix.mayhemfile }}'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mayhemfile:
+          - mayhem/Mayhemfile_fuzz-alg-anomalymodel
+          - mayhem/Mayhemfile_fuzz-alg-asn1-ber
+          - mayhem/Mayhemfile_fuzz-alg-bins
+          - mayhem/Mayhemfile_fuzz-alg-crc32-md5
+          - mayhem/Mayhemfile_fuzz-alg-hll
+          - mayhem/Mayhemfile_fuzz-alg-hw-rsi-outliers-da
+          - mayhem/Mayhemfile_fuzz-alg-isolationforest
+          - mayhem/Mayhemfile_fuzz-alg-jitter
+          - mayhem/Mayhemfile_fuzz-alg-memmem
+          - mayhem/Mayhemfile_fuzz-alg-quick-encryption
+          - mayhem/Mayhemfile_fuzz-alg-ranking
+          - mayhem/Mayhemfile_fuzz-alg-ses-des
+          - mayhem/Mayhemfile_fuzz-alg-shoco
+          - mayhem/Mayhemfile_fuzz-alg-strnstr
+          - mayhem/Mayhemfile_fuzz-binaryfusefilter
+          - mayhem/Mayhemfile_fuzz-community-id
+          - mayhem/Mayhemfile_fuzz-config
+          - mayhem/Mayhemfile_fuzz-deserialization
+          - mayhem/Mayhemfile_fuzz-dga
+          - mayhem/Mayhemfile_fuzz-dga-url
+          - mayhem/Mayhemfile_fuzz-dns-parse
+          - mayhem/Mayhemfile_fuzz-ds-address-cache
+          - mayhem/Mayhemfile_fuzz-ds-ahocorasick
+          - mayhem/Mayhemfile_fuzz-ds-bitmap
+          - mayhem/Mayhemfile_fuzz-ds-bitmap64-fuse
+          - mayhem/Mayhemfile_fuzz-ds-btree
+          - mayhem/Mayhemfile_fuzz-ds-cmsketch
+          - mayhem/Mayhemfile_fuzz-ds-domain-classify
+          - mayhem/Mayhemfile_fuzz-ds-filter
+          - mayhem/Mayhemfile_fuzz-ds-hash
+          - mayhem/Mayhemfile_fuzz-ds-kdtree
+          - mayhem/Mayhemfile_fuzz-ds-libcache
+          - mayhem/Mayhemfile_fuzz-ds-patricia
+          - mayhem/Mayhemfile_fuzz-ds-ptree
+          - mayhem/Mayhemfile_fuzz-ds-tree
+          - mayhem/Mayhemfile_fuzz-filecfg-categories
+          - mayhem/Mayhemfile_fuzz-filecfg-category
+          - mayhem/Mayhemfile_fuzz-filecfg-config
+          - mayhem/Mayhemfile_fuzz-filecfg-malicious-ja4
+          - mayhem/Mayhemfile_fuzz-filecfg-malicious-sha1
+          - mayhem/Mayhemfile_fuzz-filecfg-protocols
+          - mayhem/Mayhemfile_fuzz-filecfg-risk-domains
+          - mayhem/Mayhemfile_fuzz-gcrypt-aes
+          - mayhem/Mayhemfile_fuzz-gcrypt-cipher
+          - mayhem/Mayhemfile_fuzz-gcrypt-gcm
+          - mayhem/Mayhemfile_fuzz-gcrypt-light
+          - mayhem/Mayhemfile_fuzz-http-parse
+          - mayhem/Mayhemfile_fuzz-is-stun-tcp
+          - mayhem/Mayhemfile_fuzz-is-stun-udp
+          - mayhem/Mayhemfile_fuzz-libinjection
+          - mayhem/Mayhemfile_fuzz-match-custom-category
+          - mayhem/Mayhemfile_fuzz-ndpi-decode-tls-blocks
+          - mayhem/Mayhemfile_fuzz-ndpi-reader
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-alloc-fail
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-nalloc
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-payload-analyzer
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-64k
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-internal
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-only-subclassification
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-randomize-ports
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-simplest
+          - mayhem/Mayhemfile_fuzz-ndpi-reader-pl7m-simplest-internal
+          - mayhem/Mayhemfile_fuzz-process-packet
+          - mayhem/Mayhemfile_fuzz-quic-get-crypto-data
+          - mayhem/Mayhemfile_fuzz-readerutils-workflow
+          - mayhem/Mayhemfile_fuzz-serialization
+          - mayhem/Mayhemfile_fuzz-tls-certificate
+          - mayhem/Mayhemfile_fuzz-tls-client-server-hello
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.ref }}
+      - name: Start analysis for ${{ matrix.mayhemfile }}
+        uses: ForAllSecure/mcode-action@v1
+        with:
+          mayhem-token: ${{ secrets.MAYHEM_TOKEN }}
+          args: --image ${{ needs.build.outputs.image }} --file ${{ matrix.mayhemfile }} --duration ${{ inputs.duration || '1200' }}

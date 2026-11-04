@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-dns-parse
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-dns-parse/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_dns_parse
+    libfuzzer: true

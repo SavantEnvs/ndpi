@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-tls-client-server-hello
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-tls-client-server-hello/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_tls_client_server_hello
+    libfuzzer: true

@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-alg-crc32-md5
+cmds:
+  - cmd: /mayhem/build-out/fuzz_alg_crc32_md5
+    libfuzzer: true

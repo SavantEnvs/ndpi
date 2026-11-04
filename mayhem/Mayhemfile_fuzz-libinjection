@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-libinjection
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-libinjection/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_libinjection
+    libfuzzer: true

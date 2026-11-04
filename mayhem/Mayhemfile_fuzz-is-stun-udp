@@ -1,0 +1,8 @@
+project: savantenvs/ndpi
+target: fuzz-is-stun-udp
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-is-stun-udp/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_is_stun_udp
+    libfuzzer: true

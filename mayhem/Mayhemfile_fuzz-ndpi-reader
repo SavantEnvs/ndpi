@@ -1,0 +1,9 @@
+project: savantenvs/ndpi
+target: fuzz-ndpi-reader
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ndpi-reader/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ndpi_reader
+    libfuzzer: true
+    dictionary: /mayhem/mayhem/fuzz-ndpi-reader/fuzz-ndpi-reader.dict

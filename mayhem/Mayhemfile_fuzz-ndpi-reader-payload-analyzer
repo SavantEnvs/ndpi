@@ -1,0 +1,9 @@
+project: savantenvs/ndpi
+target: fuzz-ndpi-reader-payload-analyzer
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz-ndpi-reader-payload-analyzer/testsuite
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ndpi_reader_payload_analyzer
+    libfuzzer: true
+    dictionary: /mayhem/mayhem/fuzz-ndpi-reader-payload-analyzer/fuzz-ndpi-reader-payload-analyzer.dict
