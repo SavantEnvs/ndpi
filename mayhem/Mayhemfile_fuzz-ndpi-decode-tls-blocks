@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ndpi-decode-tls-blocks
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ndpi_decode_tls_blocks
+    libfuzzer: true

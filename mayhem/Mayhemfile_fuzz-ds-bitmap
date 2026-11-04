@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ds-bitmap
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_bitmap
+    libfuzzer: true

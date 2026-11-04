@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ds-bitmap64-fuse
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_bitmap64_fuse
+    libfuzzer: true

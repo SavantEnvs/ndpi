@@ -1,0 +1,6 @@
+project: savantenvs/ndpi
+target: fuzz-process-packet
+cmds:
+  - cmd: /mayhem/build-out/fuzz_process_packet
+    libfuzzer: true
+    dictionary: /mayhem/fuzz/dictionary.dict

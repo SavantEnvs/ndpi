@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-gcrypt-gcm
+cmds:
+  - cmd: /mayhem/build-out/fuzz_gcrypt_gcm
+    libfuzzer: true

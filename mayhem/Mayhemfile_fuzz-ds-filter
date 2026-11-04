@@ -1,0 +1,5 @@
+project: savantenvs/ndpi
+target: fuzz-ds-filter
+cmds:
+  - cmd: /mayhem/build-out/fuzz_ds_filter
+    libfuzzer: true
